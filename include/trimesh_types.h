@@ -47,6 +47,12 @@ namespace trimesh
         unsigned char r,g,b;
         float nx, ny, nz;
         float curvature;
+
+        vertex_t() : 
+        x{0.f}, y{0.f}, z{0.f},
+        r{'0'}, g{'0'}, b{'0'}, 
+        nx{0.f}, ny{0.f}, nz{ 0.f }, 
+        curvature{0.f}{}
     };
 
     struct halfedge_t
