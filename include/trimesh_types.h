@@ -42,7 +42,10 @@ namespace trimesh
 
     struct vertex_t
     {
-        float x, y, z, r, g, b, nx, ny, nz, curvature;
+        float x, y, z;
+        unsigned char r,g,b;
+        float nx, ny, nz;
+        float curvature;
     };
 }
 

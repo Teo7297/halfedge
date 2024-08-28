@@ -128,7 +128,7 @@ public:
         
         std::vector< index_t > neighbors;
         vertex_vertex_neighbors( vertex_index, neighbors );
-        return neighbors.size();
+        return static_cast<int>(neighbors.size());
     }
     
     void vertex_face_neighbors( const index_t vertex_index, std::vector< index_t >& result ) const
