@@ -3,7 +3,6 @@
 #include "trimesh_types.h" // triangle_t, edge_t
 #include <vector>
 #include <map>
-#include <unordered_map>
 
 namespace trimesh
 {

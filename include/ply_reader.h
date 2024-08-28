@@ -9,14 +9,14 @@
 #include "trimesh_types.h"
 #include "trimesh.h"
 
-using namespace trimesh;
-
 class PlyReader
 {
 public:
 
-    static void loadPlyFile(const std::string& filename, trimesh_t& outMesh)
+    static void loadPlyFile(const std::string& filename, trimesh::trimesh_t& outMesh)
     {
+        using namespace trimesh;
+
         std::vector<vertex_t> vertices;
         std::vector<triangle_t> triangles;
         std::vector<edge_t> edges;
@@ -120,8 +120,10 @@ public:
         outMesh.build(vertices.size(), &vertices[0], triangles.size(), &triangles[0], edges.size(), &edges[0]);
     }
 
-    static void savePlyFile(const std::string &filename, const trimesh_t& mesh)
+    static void savePlyFile(const std::string &filename, const trimesh::trimesh_t& mesh)
     {
+        using namespace trimesh;
+
         std::ofstream file(filename);
         if (!file.is_open())
         {

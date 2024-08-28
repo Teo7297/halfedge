@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 
 namespace trimesh
 {
@@ -71,5 +71,5 @@ namespace trimesh
         }
     };
 
-    typedef std::unordered_map<index_t, vertex_t> vertices_data_map;
+    typedef std::map<index_t, vertex_t> vertices_data_map;
 }
