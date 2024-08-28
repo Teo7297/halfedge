@@ -111,6 +111,7 @@ public:
             if( hei == start_hei ) break;
         }
     }
+    
     std::vector< index_t > vertex_vertex_neighbors( const index_t vertex_index ) const
     {
         std::vector< index_t > result;
@@ -152,6 +153,7 @@ public:
             if( hei == start_hei ) break;
         }
     }
+    
     std::vector< index_t > vertex_face_neighbors( const index_t vertex_index ) const
     {
         std::vector< index_t > result;
@@ -174,7 +176,10 @@ public:
     
     std::vector< std::pair< index_t, index_t > > boundary_edges() const;
 
-    inline vertices_data_map vertices_map() { return m_vertices_data_map; }
+    inline vertices_data_map vertices_data() const { return m_vertices_data_map; }
+    inline std::vector<index_t> vertices() const { return m_vertex_halfedges; }
+    inline std::vector<index_t> triangles() const { return m_face_halfedges; }
+    inline std::vector<halfedge_t> halfEdges() const { return m_halfedges; }
 
 private:
     std::vector< halfedge_t > m_halfedges;

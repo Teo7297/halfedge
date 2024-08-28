@@ -5,39 +5,27 @@
 int main( int argc, char* argv[] )
 {
 
-    PlyReader ply("c:\\meshes\\pp.ply");
+    trimesh_t mesh;
+
+    PlyReader::loadPlyFile("c:\\meshes\\testmesh.ply", mesh);
+
+    PlyReader::savePlyFile("c:\\meshes\\heyo.ply", mesh);
+
+
+    std::cout << "vertices count: " << mesh.vertices().size() << std::endl;
+    std::cout << "faces count: " << mesh.triangles().size() << std::endl;
+    std::cout << "edges count: " << mesh.halfEdges().size() / 2 << std::endl;
     
-
-    ply.savePlyFile("c:\\meshes\\heyo.ply");
-
-    std::vector<trimesh::triangle_t> triangles(ply.getFaces().size());
-    std::vector<trimesh::vertex_t> vertices(ply.getVertices().size());
-    std::vector< trimesh::edge_t > edges;
-    
-    triangles = ply.getFaces();
-    vertices = ply.getVertices();
-    trimesh::unordered_edges_from_triangles( triangles.size(), &triangles[0], edges );
-
-    std::cout << "vertices count: " << vertices.size() << std::endl;
-    std::cout << "faces count: " << triangles.size() << std::endl;
-    std::cout << "edges count: " << edges.size() << std::endl;
-    
-    trimesh::trimesh_t mesh;
-    mesh.build(vertices.size(), &vertices[0], triangles.size(), &triangles[0], edges.size(), &edges[0]);
-
     // Use 'mesh' to walk the connectivity.
-    std::vector< trimesh::index_t > neighs;
-    for (int vi = 0; vi < vertices.size(); ++vi)
+    auto triangles = mesh.triangles();
+    for(const auto& triangle : triangles)
     {
-        mesh.vertex_vertex_neighbors( vi, neighs );
-        
-        std::cout << "neighbors of vertex " << vi << ": ";
-        for( int i = 0; i < neighs.size(); ++i )
-        {
-            auto v = mesh.vertices_map()[neighs.at(i)];
-            std::cout << ' ' << neighs.at(i) << "( " << v.x << ", " << v.y << ", " << v.z << " )";
-        }
-        std::cout << '\n';
+        auto he1 = mesh.halfedge(triangle);
+        auto he2 = mesh.halfedge(he1.next_he);
+        auto he3 = mesh.halfedge(he2.next_he);
+        std::cout << he1.to_vertex << " ";
+        std::cout << he2.to_vertex << " ";
+        std::cout << he3.to_vertex << std::endl;
     }
 
     return 0;

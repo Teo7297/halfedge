@@ -1,5 +1,4 @@
-#ifndef PLYREADER_H
-#define PLYREADER_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -8,78 +7,20 @@
 #include <iostream>
 
 #include "trimesh_types.h"
+#include "trimesh.h"
 
 using namespace trimesh;
 
 class PlyReader
 {
 public:
-    // Constructor that takes the filename
-    PlyReader(const std::string &filename)
+
+    static void loadPlyFile(const std::string& filename, trimesh_t& outMesh)
     {
-        loadPlyFile(filename);
-    }
+        std::vector<vertex_t> vertices;
+        std::vector<triangle_t> triangles;
+        std::vector<edge_t> edges;
 
-    void savePlyFile(const std::string &filename)
-    {
-        std::ofstream file(filename);
-        if (!file.is_open())
-        {
-            std::cerr << "Error: Could not open the file " << filename << " for writing." << std::endl;
-            return;
-        }
-
-        // Write the PLY header
-        file << "ply\n";
-        file << "format ascii 1.0\n";
-        file << "element vertex " << vertices.size() << "\n";
-        file << "property float x\n";
-        file << "property float y\n";
-        file << "property float z\n";
-        file << "property uchar red\n";
-        file << "property uchar green\n";
-        file << "property uchar blue\n";
-        file << "property float nx\n";
-        file << "property float ny\n";
-        file << "property float nz\n";
-        file << "property float curvature\n";
-        file << "element face " << faces.size() << "\n";
-        file << "property list uchar int vertex_indices\n";
-        file << "end_header\n";
-
-        // Write vertex data
-        for (const auto &vertex : vertices)
-        {
-            file << vertex.x << " " << vertex.y << " " << vertex.z << " "
-                 << static_cast<int>(vertex.r) << " " << static_cast<int>(vertex.g) << " " << static_cast<int>(vertex.b) << " "
-                 << vertex.nx << " " << vertex.ny << " " << vertex.nz << " "
-                 << vertex.curvature << "\n";
-        }
-
-        // Write face data
-        for (const auto &face : faces)
-        {
-            file << 3;
-            for (int index : face.v)
-            {
-                file << " " << index;
-            }
-            file << "\n";
-        }
-
-        file.close();
-    }
-
-    // Getters for vertices and faces
-    const std::vector<vertex_t> &getVertices() const { return vertices; }
-    const std::vector<triangle_t> &getFaces() const { return faces; }
-
-private:
-    std::vector<vertex_t> vertices;
-    std::vector<triangle_t> faces;
-
-    void loadPlyFile(const std::string &filename)
-    {
         std::ifstream file(filename);
         if (!file.is_open())
         {
@@ -167,13 +108,75 @@ private:
                     iss >> index;
                     face.v[i] = index;
                 }
-                faces.push_back(face);
+                triangles.push_back(face);
                 faceCount--;
             }
         }
 
         file.close();
+
+        trimesh::unordered_edges_from_triangles(triangles.size(), &triangles[0], edges);
+
+        outMesh.build(vertices.size(), &vertices[0], triangles.size(), &triangles[0], edges.size(), &edges[0]);
+    }
+
+    static void savePlyFile(const std::string &filename, const trimesh_t& mesh)
+    {
+        std::ofstream file(filename);
+        if (!file.is_open())
+        {
+            std::cerr << "Error: Could not open the file " << filename << " for writing." << std::endl;
+            return;
+        }
+
+        // Write the PLY header
+        file << "ply\n";
+        file << "format ascii 1.0\n";
+        file << "element vertex " << mesh.vertices().size() << "\n";
+        file << "property float x\n";
+        file << "property float y\n";
+        file << "property float z\n";
+        file << "property uchar red\n";
+        file << "property uchar green\n";
+        file << "property uchar blue\n";
+        file << "property float nx\n";
+        file << "property float ny\n";
+        file << "property float nz\n";
+        file << "property float curvature\n";
+        file << "element face " << mesh.triangles().size() << "\n";
+        file << "property list uchar int vertex_indices\n";
+        file << "end_header\n";
+
+        // Write vertex data
+        for (const auto& [id, vertex] : mesh.vertices_data())
+        {        
+            file 
+                << vertex.x << " "
+                << vertex.y << " "
+                << vertex.z << " "
+                << static_cast<int>(vertex.r) << " "
+                << static_cast<int>(vertex.g) << " "
+                << static_cast<int>(vertex.b) << " "
+                << vertex.nx << " "
+                << vertex.ny << " "
+                << vertex.nz << " "
+                << vertex.curvature << "\n";
+        }
+
+        // Write face data
+        auto triangles = mesh.triangles();
+        for (const auto &triangle : triangles)
+        {
+            auto he1 = mesh.halfedge(triangle);
+            auto he2 = mesh.halfedge(he1.next_he);
+            auto he3 = mesh.halfedge(he2.next_he);
+            file << 3;
+            file << " " << he1.to_vertex;
+            file << " " << he2.to_vertex;
+            file << " " << he3.to_vertex;
+            file << "\n";
+        }
+
+        file.close();
     }
 };
-
-#endif // PLYREADER_H
