@@ -10,9 +10,16 @@ trimesh.h trimesh_t:
           rather it looks only at faces and only while building the half-edges
           (make sure to re-create the half-edges anytime the faces change!)
 
-example.cpp:
-    A very simple file to show usage of trimesh_t.
-    Compile it with the one-liner at the top.
+
+Compilation:
+    
+    git clone --depth=1 https://github.com/Teo7297/halfedge.git
+    
+    mkdir build
+    
+    cd ./build
+    
+    cmake ..
 
 Usage:
     std::vector< trimesh::triangle_t > triangles;
@@ -26,7 +33,3 @@ Usage:
     mesh.build( num_vertices, triangles.size(), &triangles[0], edges.size(), &edges[0] );
     
     // Use 'mesh' to walk the connectivity.
-
-Version History:
-    - 2012-01-12:
-        initial release

@@ -7,7 +7,7 @@ int main( int argc, char* argv[] )
 
     trimesh::trimesh_t mesh;
 
-    PlyReader::loadPlyFile("c:\\meshes\\pp.ply", mesh);
+    PlyReader::loadPlyFile("c:\\meshes\\lower.ply", mesh);
 
     std::cout << "vertices count: " << mesh.vertices().size() << std::endl;
     std::cout << "faces count: " << mesh.triangles().size() << std::endl;
