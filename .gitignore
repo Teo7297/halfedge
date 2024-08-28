@@ -1,5 +1,2 @@
-.DS_Store
-*.o
-*.dSYM
-*~
-example
+build/
+.vscode/
