@@ -39,6 +39,11 @@ namespace trimesh
             v[0] = v[1] = v[2] = -1;
         }
     };
+
+    struct vertex_t
+    {
+        float x, y, z, r, g, b, nx, ny, nz, curvature;
+    };
 }
 
 #endif /* __trimesh_types_h__ */

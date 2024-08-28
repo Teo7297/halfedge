@@ -4,6 +4,7 @@
 #include "trimesh_types.h" // triangle_t, edge_t
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 namespace trimesh
 {
@@ -16,7 +17,8 @@ class trimesh_t
 public:
     // I need positive and negative numbers so that I can use -1 for an invalid index.
     typedef long index_t;
-    
+    typedef std::unordered_map<index_t, vertex_t> vertices_data_map;
+
     struct halfedge_t
     {
         // Index into the vertex array.
@@ -45,8 +47,8 @@ public:
     //       but could do this for callers who do not already have edges.
     // NOTE: 'triangles' and 'edges' are not needed after the call to build()
     //       completes and may be destroyed.
-    void build( const unsigned long num_vertices, const unsigned long num_triangles, const trimesh::triangle_t* triangles, const unsigned long num_edges, const trimesh::edge_t* edges );
-    
+    void build(const unsigned long num_vertices, const vertex_t *vertices, const unsigned long num_triangles, const trimesh::triangle_t *triangles, const unsigned long num_edges, const trimesh::edge_t *edges);
+
     void clear()
     {
         m_halfedges.clear();
@@ -171,7 +173,9 @@ public:
     std::vector< index_t > boundary_vertices() const;
     
     std::vector< std::pair< index_t, index_t > > boundary_edges() const;
-    
+
+    inline vertices_data_map vertices_map() { return m_vertices_data_map; }
+
 private:
     std::vector< halfedge_t > m_halfedges;
     // Offsets into the 'halfedges' sequence, one per vertex.
@@ -183,6 +187,8 @@ private:
     // A map from an ordered edge (an std::pair of index_t's) to an offset into the 'halfedge' sequence.
     typedef std::map< std::pair< index_t, index_t >, index_t > directed_edge2index_map_t;
     directed_edge2index_map_t m_directed_edge2he_index;
+
+    vertices_data_map m_vertices_data_map;
 };
 
 }

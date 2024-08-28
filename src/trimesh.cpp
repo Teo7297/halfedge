@@ -30,7 +30,7 @@ trimesh::trimesh_t::index_t directed_edge2face_index( const directed_edge2index_
 namespace trimesh
 {
 
-void trimesh_t::build( const unsigned long num_vertices, const unsigned long num_triangles, const triangle_t* triangles, const unsigned long num_edges, const edge_t* edges )
+void trimesh_t::build( const unsigned long num_vertices, const vertex_t* vertices, const unsigned long num_triangles, const triangle_t* triangles, const unsigned long num_edges, const edge_t* edges )
 {
     /*
     Generates all half edge data structures for the mesh given by its vertices 'self.vs'
@@ -176,6 +176,12 @@ void trimesh_t::build( const unsigned long num_vertices, const unsigned long num
             
             outgoing.erase( outgoing_hei );
         }
+    }
+
+    // Populate vertex map with data for algorithms usage
+    for(size_t i = 0; i < num_vertices; i++)
+    {
+        m_vertices_data_map[i] = vertices[i];
     }
     
 #ifndef NDEBUG
