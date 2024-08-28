@@ -7,19 +7,19 @@
 
 namespace
 {
-typedef std::map< std::pair< trimesh::trimesh_t::index_t, trimesh::trimesh_t::index_t >, trimesh::trimesh_t::index_t > directed_edge2index_map_t;
-trimesh::trimesh_t::index_t directed_edge2face_index( const directed_edge2index_map_t& de2fi, trimesh::trimesh_t::index_t vertex_i, trimesh::trimesh_t::index_t vertex_j )
+typedef std::map< std::pair< trimesh::index_t, trimesh::index_t >, trimesh::index_t > directed_edge2index_map_t;
+trimesh::index_t directed_edge2face_index( const directed_edge2index_map_t& de2fi, trimesh::index_t vertex_i, trimesh::index_t vertex_j )
 {
     assert( !de2fi.empty() );
     
-    directed_edge2index_map_t::const_iterator it = de2fi.find( std::make_pair( vertex_i, vertex_j ) );
+    directed_edge2index_map_t::const_iterator it = de2fi.find( { vertex_i, vertex_j } );
     
     // If no such directed edge exists, then there's no such face in the mesh.
     // The edge must be a boundary edge.
     // In this case, the reverse orientation edge must have a face.
     if( it == de2fi.end() )
     {
-        assert( de2fi.find( std::make_pair( vertex_j, vertex_i ) ) != de2fi.end() );
+        assert( de2fi.find( { vertex_j, vertex_i } ) != de2fi.end() );
         return -1;
     }
     
@@ -46,9 +46,9 @@ void trimesh_t::build( const unsigned long num_vertices, const vertex_t* vertice
     for( int fi = 0; fi < num_triangles; ++fi )
     {
         const triangle_t& tri = triangles[fi];
-        de2fi[ std::make_pair( tri.v[0], tri.v[1] ) ] = fi;
-        de2fi[ std::make_pair( tri.v[1], tri.v[2] ) ] = fi;
-        de2fi[ std::make_pair( tri.v[2], tri.v[0] ) ] = fi;
+        de2fi[ { tri.v[0], tri.v[1] } ] = fi;
+        de2fi[ { tri.v[1], tri.v[2] } ] = fi;
+        de2fi[ { tri.v[2], tri.v[0] } ] = fi;
     }
     
     clear();
@@ -85,10 +85,10 @@ void trimesh_t::build( const unsigned long num_vertices, const vertex_t* vertice
         he1.opposite_he = he0index;
         
         // Also store the index in our m_directed_edge2he_index map.
-        assert( m_directed_edge2he_index.find( std::make_pair( edge.v[0], edge.v[1] ) ) == m_directed_edge2he_index.end() );
-        assert( m_directed_edge2he_index.find( std::make_pair( edge.v[1], edge.v[0] ) ) == m_directed_edge2he_index.end() );
-        m_directed_edge2he_index[ std::make_pair( edge.v[0], edge.v[1] ) ] = he0index;
-        m_directed_edge2he_index[ std::make_pair( edge.v[1], edge.v[0] ) ] = he1index;
+        assert( m_directed_edge2he_index.find( { edge.v[0], edge.v[1] } ) == m_directed_edge2he_index.end() );
+        assert( m_directed_edge2he_index.find( { edge.v[1], edge.v[0] } ) == m_directed_edge2he_index.end() );
+        m_directed_edge2he_index[ { edge.v[0], edge.v[1] } ] = he0index;
+        m_directed_edge2he_index[ { edge.v[1], edge.v[0] } ] = he1index;
         
         // If the vertex pointed to by a half-edge doesn't yet have an out-going
         // halfedge, store the opposite halfedge.
@@ -146,7 +146,7 @@ void trimesh_t::build( const unsigned long num_vertices, const vertex_t* vertice
         else if( face.v[2] == i ) j = face.v[0];
         assert( -1 != j );
         
-        he.next_he = m_directed_edge2he_index[ std::make_pair(i,j) ];
+        he.next_he = m_directed_edge2he_index[ { i, j } ];
     }
     
     // Make a map from vertices to boundary halfedges (indices) originating from them.
@@ -192,7 +192,7 @@ void trimesh_t::build( const unsigned long num_vertices, const vertex_t* vertice
 #endif
 }
 
-std::vector< trimesh_t::index_t > trimesh_t::boundary_vertices() const
+std::vector< index_t > trimesh_t::boundary_vertices() const
 {
     /*
     Returns a list of the vertex indices on the boundary.
@@ -216,7 +216,7 @@ std::vector< trimesh_t::index_t > trimesh_t::boundary_vertices() const
     return std::vector< index_t >( result.begin(), result.end() );
 }
 
-std::vector< std::pair< trimesh_t::index_t, trimesh_t::index_t > > trimesh_t::boundary_edges() const
+std::vector< std::pair< index_t, index_t > > trimesh_t::boundary_edges() const
 {
     /*
     Returns a list of undirected boundary edges (i,j).  If (i,j) is in the result, (j,i) will not be.
@@ -244,9 +244,9 @@ void unordered_edges_from_triangles( const unsigned long num_triangles, const tr
     edge_set_t edges;
     for( int t = 0; t < num_triangles; ++t )
     {
-        edges.insert( std::make_pair( std::min( triangles[t].i(), triangles[t].j() ), std::max( triangles[t].i(), triangles[t].j() ) ) );
-        edges.insert( std::make_pair( std::min( triangles[t].j(), triangles[t].k() ), std::max( triangles[t].j(), triangles[t].k() ) ) );
-        edges.insert( std::make_pair( std::min( triangles[t].k(), triangles[t].i() ), std::max( triangles[t].k(), triangles[t].i() ) ) );
+        edges.insert( { std::min( triangles[t].i(), triangles[t].j() ), std::max( triangles[t].i(), triangles[t].j() ) } );
+        edges.insert( { std::min( triangles[t].j(), triangles[t].k() ), std::max( triangles[t].j(), triangles[t].k() ) } );
+        edges.insert( { std::min( triangles[t].k(), triangles[t].i() ), std::max( triangles[t].k(), triangles[t].i() ) } );
     }
     
     edges_out.resize( edges.size() );

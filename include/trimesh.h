@@ -1,5 +1,4 @@
-#ifndef __trimesh_h__
-#define __trimesh_h__
+#pragma once
 
 #include "trimesh_types.h" // triangle_t, edge_t
 #include <vector>
@@ -15,32 +14,6 @@ void unordered_edges_from_triangles( const unsigned long num_triangles, const tr
 class trimesh_t
 {
 public:
-    // I need positive and negative numbers so that I can use -1 for an invalid index.
-    typedef long index_t;
-    typedef std::unordered_map<index_t, vertex_t> vertices_data_map;
-
-    struct halfedge_t
-    {
-        // Index into the vertex array.
-        index_t to_vertex;
-        // Index into the face array.
-        index_t face;
-        // Index into the edges array.
-        index_t edge;
-        // Index into the halfedges array.
-        index_t opposite_he;
-        // Index into the halfedges array.
-        index_t next_he;
-        
-        halfedge_t() :
-            to_vertex( -1 ),
-            face( -1 ),
-            edge( -1 ),
-            opposite_he( -1 ),
-            next_he( -1 )
-            {}
-    };
-    
     // Builds the half-edge data structures from the given triangles and edges.
     // NOTE: 'edges' can be derived from 'triangles' by calling
     //       unordered_edges_from_triangles(), above.  build() does not
@@ -69,7 +42,7 @@ public:
         */
         
         const halfedge_t& he = m_halfedges[ he_index ];
-        return std::make_pair( m_halfedges[ he.opposite_he ].to_vertex, he.to_vertex );
+        return { m_halfedges[ he.opposite_he ].to_vertex, he.to_vertex };
     }
     
     index_t directed_edge2he_index( const index_t i, const index_t j ) const
@@ -84,7 +57,7 @@ public:
         /// This isn't const, and doesn't handle the case where (i,j) isn't known:
         // return m_directed_edge2he_index[ std::make_pair( i,j ) ];
         
-        directed_edge2index_map_t::const_iterator result = m_directed_edge2he_index.find( std::make_pair( i,j ) );
+        directed_edge2index_map_t::const_iterator result = m_directed_edge2he_index.find( { i, j } );
         if( result == m_directed_edge2he_index.end() ) return -1;
         
         return result->second;
@@ -111,7 +84,7 @@ public:
             if( hei == start_hei ) break;
         }
     }
-    
+
     std::vector< index_t > vertex_vertex_neighbors( const index_t vertex_index ) const
     {
         std::vector< index_t > result;
@@ -197,5 +170,3 @@ private:
 };
 
 }
-
-#endif /* __trimesh_h__ */

@@ -1,10 +1,11 @@
-#ifndef __trimesh_types_h__
-#define __trimesh_types_h__
+#pragma once
+
+#include <unordered_map>
 
 namespace trimesh
 {
     typedef long index_t;
-    
+
     struct edge_t
     {
         index_t v[2];
@@ -47,6 +48,28 @@ namespace trimesh
         float nx, ny, nz;
         float curvature;
     };
-}
 
-#endif /* __trimesh_types_h__ */
+    struct halfedge_t
+    {
+        // Index into the vertex array.
+        index_t to_vertex;
+        // Index into the face array.
+        index_t face;
+        // Index into the edges array.
+        index_t edge;
+        // Index into the halfedges array.
+        index_t opposite_he;
+        // Index into the halfedges array.
+        index_t next_he;
+
+        halfedge_t() : to_vertex(-1),
+                       face(-1),
+                       edge(-1),
+                       opposite_he(-1),
+                       next_he(-1)
+        {
+        }
+    };
+
+    typedef std::unordered_map<index_t, vertex_t> vertices_data_map;
+}
